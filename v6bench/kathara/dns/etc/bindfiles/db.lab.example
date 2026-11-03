@@ -1,0 +1,22 @@
+$TTL 3600
+@	IN	SOA	ns.lab.www.qq.com.	hostmaster.lab.www.qq.com. (
+	2026110301
+	3600
+	900
+	1209600
+	300
+)
+
+@	IN	NS	ns.lab.
+ns	IN	A	192.168.0.53
+ns	IN	AAAA	2001:db8::53
+
+siit	IN	A	192.168.46.1
+dual	IN	A	60.29.240.41
+dual	IN	AAAA	2408:8711:10:1001::3e
+dual	IN	A	125.36.181.245
+dual	IN	AAAA	2408:8710:20:11c1::50
+ipv4	IN	A	60.29.240.41
+ipv4	IN	A	125.36.181.245
+ipv6	IN	AAAA	2408:8711:10:1001::3e
+ipv6	IN	AAAA	2408:8710:20:11c1::50
