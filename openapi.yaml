@@ -1,0 +1,144 @@
+openapi: 3.0.3
+info:
+  title: apis.guru directory (V6Bench lab target)
+  version: 2.2.0
+  description: "Trimmed copy of https://api.apis.guru/v2/openapi.yaml for the V6Bench\
+    \ lab.\n\nOnly the two static, unauthenticated, small GET endpoints are kept:\n\
+    \  /metrics.json   ~1 KB\n  /providers.json ~14 KB\n\nDropped on purpose: /list.json\
+    \ (8 MB, ~20 s over plain HTTP), and the\nparameterised /{provider}.json and /specs/...\
+    \ paths, which need variables\nthat the lab does not supply.\n\nLab notes: test_runner.sh\
+    \ builds BASE_URL itself as proto://<view>.lab.<domain> with NO path\nprefix,\
+    \ and the converter emits ${BASE_URL} + <path>, so the /v2 prefix must live in\
+    \ the\npath key itself (that is why these are written /v2/metrics.json).\n  BASE_DOMAIN=api.apis.guru\n\
+    \  BASE_PROTO=http\nProtocol must be http: the lab uses fake hostnames, and Cloudflare\
+    \ rejects\nthem at the TLS SNI stage (handshake failure 552) before any certificate\
+    \ check."
+servers:
+- url: http://api.apis.guru
+  description: 'prefix /v2 is part of each path: test_runner builds BASE_URL as proto://<view>.lab.<domain>
+    with no prefix'
+paths:
+  /v2/metrics.json:
+    get:
+      operationId: getMetrics
+      summary: Get basic metrics
+      description: 'Some basic metrics for the entire directory.
+
+        Just stunning numbers to put on a front page and are intended purely for WoW
+        effect :)
+
+        '
+      tags:
+      - APIs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metrics'
+  /v2/providers.json:
+    get:
+      operationId: getProviders
+      tags:
+      - APIs
+      summary: List all providers
+      description: 'List all the providers in the directory
+
+        '
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: string
+                      minLength: 1
+                    minItems: 1
+components:
+  schemas:
+    Metrics:
+      description: List of basic metrics
+      type: object
+      required:
+      - numSpecs
+      - numAPIs
+      - numEndpoints
+      properties:
+        numSpecs:
+          description: Number of API definitions including different versions of the
+            same API
+          type: integer
+          minimum: 1
+        numAPIs:
+          description: Number of unique APIs
+          type: integer
+          minimum: 1
+        numEndpoints:
+          description: Total number of endpoints inside all definitions
+          type: integer
+          minimum: 1
+        unreachable:
+          description: Number of unreachable (4XX,5XX status) APIs
+          type: integer
+        invalid:
+          description: Number of newly invalid APIs
+          type: integer
+        unofficial:
+          description: Number of unofficial APIs
+          type: integer
+        fixes:
+          description: Total number of fixes applied across all APIs
+          type: integer
+        fixedPct:
+          description: Percentage of all APIs where auto fixes have been applied
+          type: integer
+        datasets:
+          description: Data used for charting etc
+          type: array
+          items: {}
+        stars:
+          description: GitHub stars for our main repo
+          type: integer
+        issues:
+          description: Open GitHub issues on our main repo
+          type: integer
+        thisWeek:
+          description: Summary totals for the last 7 days
+          type: object
+          properties:
+            added:
+              description: APIs added in the last week
+              type: integer
+            updated:
+              description: APIs updated in the last week
+              type: integer
+        numDrivers:
+          description: Number of methods of API retrieval
+          type: integer
+        numProviders:
+          description: Number of API providers in directory
+          type: integer
+      additionalProperties: false
+      example:
+        numAPIs: 2501
+        numEndpoints: 106448
+        numSpecs: 3329
+        unreachable: 123
+        invalid: 598
+        unofficial: 25
+        fixes: 81119
+        fixedPct: 22
+        datasets: []
+        stars: 2429
+        issues: 28
+        thisWeek:
+          added: 45
+          updated: 171
+        numDrivers: 10
+        numProviders: 659

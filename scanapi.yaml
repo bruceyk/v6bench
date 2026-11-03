@@ -1,0 +1,20 @@
+endpoints:
+- name: apis.guru directory (V6Bench lab target)
+  path: ${BASE_URL}
+  requests:
+  - name: Get_basic_metrics
+    path: /v2/metrics.json
+    method: get
+    tests:
+    - name: status_code_is_200
+      assert: ${{response.status_code == 200}}
+    headers:
+      Host: ${BASE_DOMAIN}
+  - name: List_all_providers
+    path: /v2/providers.json
+    method: get
+    tests:
+    - name: status_code_is_200
+      assert: ${{response.status_code == 200}}
+    headers:
+      Host: ${BASE_DOMAIN}
