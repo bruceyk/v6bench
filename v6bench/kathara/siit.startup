@@ -8,9 +8,27 @@ sysctl -w net.ipv4.ip_forward=1
 sysctl -w net.ipv6.conf.all.forwarding=1
 
 source /shared/env/test_vars.env
-BASE_IPV6="$(dig "${BASE_DOMAIN}" @8.8.8.8 aaaa +short +cd +do |head -1)" # tags 'cd' and 'do' are included to avoid nat64 resolver
+
+# tags 'cd' and 'do' are included to avoid the DNS64 resolver rewriting the AAAA
+BASE_IPV6=""
+for addr in $(dig "${BASE_DOMAIN}" @8.8.8.8 aaaa +short +cd +do); do
+  # a domain can publish several AAAA records and not all of them are reachable; keep the
+  # first one that answers a TCP connect, because one EAMT entry maps a single /128
+  if nc -z -w 3 "${addr}" 80 >/dev/null 2>&1 || nc -z -w 3 "${addr}" 443 >/dev/null 2>&1; then
+    BASE_IPV6="${addr}"
+    break
+  fi
+done
+if [ -z "${BASE_IPV6}" ]; then
+  BASE_IPV6="$(dig "${BASE_DOMAIN}" @8.8.8.8 aaaa +short +cd +do | head -1)"
+  echo "WARN: no AAAA of ${BASE_DOMAIN} answered a TCP probe, falling back to '${BASE_IPV6}'"
+fi
 
 modprobe jool_siit
 jool_siit instance add "siit" --netfilter
 jool_siit -i "siit" eamt add 2001:db8:4::/120 192.168.0.0/24
-jool_siit -i "siit" eamt add 2a00:1450:4001:c21::8b/128 192.168.46.1/32
+if [ -n "${BASE_IPV6}" ]; then
+  jool_siit -i "siit" eamt add "${BASE_IPV6}/128" 192.168.46.1/32
+else
+  echo "WARN: ${BASE_DOMAIN} has no AAAA record; siit view cannot reach an IPv6 target"
+fi
