@@ -1,6 +1,7 @@
 venv
 *.yaml
 v6bench/kathara/shared/env/*
+!v6bench/kathara/shared/env/test_vars.env.example
 v6bench/kathara/shared/results/*
 v6bench/kathara/dns/etc/bindfiles/db.lab
 v6bench/kathara/dns/etc/bindfiles/named.conf.lab-zones
