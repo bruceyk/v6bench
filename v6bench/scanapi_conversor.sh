@@ -113,7 +113,7 @@ grep -Po '(?<=\$\{)\w+(?=\})' scanapi.yaml |\
 echo 'export BASE_DOMAIN="" # add here the same domain you used in the "zonefile_creator.py" script' >> "${TEST_VARS_PATH}"
 echo 'export BASE_PROTO="https" # set here http or https for the requests' >> "${TEST_VARS_PATH}"
 
-python3 "${SCRIPT_PATH}/add_host_header.py"
+python3.12 "${SCRIPT_PATH}/add_host_header.py"
 mv -v scanapi.yaml "${SHARED_DIR}/shared_data/scanapi.yaml"
 
 echo "Done!"
