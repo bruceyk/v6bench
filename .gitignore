@@ -1,5 +1,9 @@
 venv
 *.yaml
+# 这几个 yaml 是有意入库的：spec 样例与转换模板
+!openapi.yaml
+!openapi.petstore-demo.yaml
+!scanapi.yaml
 v6bench/kathara/shared/env/*
 !v6bench/kathara/shared/env/test_vars.env.example
 v6bench/kathara/shared/results/*
