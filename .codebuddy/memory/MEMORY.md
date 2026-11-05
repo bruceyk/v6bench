@@ -11,3 +11,10 @@
 - `.gitignore` 里 `*.yaml` 是全局规则，新加的 yaml 文件默认不入库，需要显式 `git add -f`。
 - `zonefile_creator.py` 生成的 `db.lab` / `named.conf.lab-zones` 落在 `v6bench/kathara/dns/etc/bindfiles/`，而 `.gitignore` 里写的是旧路径 `v6bench/kathara/bind/...`（分析笔记 D-5），跑一次生成脚本会让仓库变脏。
 - 本机环境限制（已实测）：host 无 IPv6 默认路由，所有依赖原生 IPv6 出网的场景必然失败；Docker 需用 `docker.1ms.run` + skopeo 逐 blob 重试拉镜像；Kathará 3.8.3 需打补丁绕过 docker 版本号 `dev` 的解析崩溃。详见 `doc/v6bench_analysis.md` 的 C 区。
+
+## 推送与远端（2026-11-05 实测，结论已修正）
+- **远端现状**：`origin` = `https://github.com/bruceyk/v6bench.git`（用户自己的 fork，2026-11-05 由上游 CEPTRO-br 改过来）；`upstream` = `https://github.com/CEPTRO-br/v6bench.git`（官方，保留用于同步）；`gitee` = `https://gitee.com/bruceyk888/v6bench.git`（备用，仓库尚未创建，可 `git remote remove gitee` 清理）。
+- **网络**：github.com **可达但抖动很大**——早前 `git ls-remote` / `curl` 连续 25~30s 超时，改为 `git@github.com` 后 2.3s 就返回 200。判断"能不能推"前必须重测一次，不要沿用旧结论；这与 docker registry 超时是同一类网络不稳。
+- **fork 现状**：`bruceyk/v6bench` 的 `main` = `628619f`（与上游一致），本地 `test-kyu` = `12592cf`，领先 12 个提交。
+- **认证**：本机原本**没有任何 github.com 凭据**（`~/.git-credentials` 只有 gitee.com 的 bruceyk888），SSH 也没有私钥。已生成 `~/.ssh/id_ed25519_github`（ed25519，无口令，权限 600）专用于 GitHub，公钥需用户在 GitHub → Settings → SSH and GPG keys 登记；登记后把 origin 切成 `git@github.com:bruceyk/v6bench.git` 再 `git push -u origin test-kyu`。
+- 仓库是 MIT License（Sávyo Morais），公开镜像/再分发合规无碍。
